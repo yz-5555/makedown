@@ -1,17 +1,20 @@
 cmake_minimum_required(VERSION 3.23)
 
-project(makedown C)
+project(makedown LANGUAGES C)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
-file(GLOB SOURCES "src/*.c")
-file(GLOB HEADERS "include/*.h")
+add_subdirectory(${CMAKE_SOURCE_DIR}/external/raylib)
+
+add_executable(${PROJECT_NAME}
+	src/main.c 
+	src/makedown.c
+	include/makedown.h)
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
-
-add_executable(${PROJECT_NAME} ${SOURCES})
+target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
 
 target_compile_options(${PROJECT_NAME} PRIVATE
     -fms-extensions
