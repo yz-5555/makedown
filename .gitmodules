@@ -1,6 +1,0 @@
-[submodule "external/--recursive"]
-	path = external/--recursive
-	url = https://github.com/raysan5/raylib.git
-[submodule "external/raylib"]
-	path = external/raylib
-	url = https://github.com/raysan5/raylib.git

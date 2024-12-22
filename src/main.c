@@ -1,14 +1,18 @@
 #include <raylib.h>
+#include "makedown.h"
 
-int main(void)
+int main(int argc, char* argv[])
 {
 	InitWindow(800, 600, "Hello, Raylib!");
+	
+	MarkdownLine md_line;
+	parse_markdown_line("Hello, H1!", &md_line);
 
 	while (!WindowShouldClose()) {
 		BeginDrawing();
 		{
 			ClearBackground(WHITE);
-			DrawText("Hello, Raylib!", 100, 100, 20, LIGHTGRAY);
+			render_markdown_line(&md_line);
 		}
 		EndDrawing();
 	}
