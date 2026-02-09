@@ -1,7 +1,7 @@
 .{
-    .name = .foo,
+    .name = .makedown,
     .version = "0.1.0",
-    .fingerprint =
+    .fingerprint = 0xd5765d13406fab7,
     .paths = .{""},
     .dependencies = .{
         .compile_commands = .{

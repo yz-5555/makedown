@@ -16,12 +16,12 @@ pub fn build(b: *std.Build) void {
         "-Wstrict-prototypes",
     };
 
-    const exe = b.addExecutable(.{ .name = b.path("foo"), .root_module = b.createModule(.{ .target = target, .optimize = optimize }) }); // Change "foo" to the project name.
-    exe.addCSourceFile(.{ .file = "./src/main.c", .flags = &flags });
-    // const src = [_][]const u8{
-    //     "./src/main.c",
-    // };
-    // exe.addCSourceFiles(.{ .files = &src, .flags = &flags });
+    const exe = b.addExecutable(.{ .name = "makedown", .root_module = b.createModule(.{ .target = target, .optimize = optimize }) });
+    const src = [_][]const u8{
+        "./src/main.c",
+        "./src/makedown.c"
+    };
+    exe.addCSourceFiles(.{ .files = &src, .flags = &flags });
     exe.addIncludePath(b.path("./include"));
     exe.linkLibC();
     // exe.linkLibCpp();
@@ -34,6 +34,6 @@ pub fn build(b: *std.Build) void {
 
     const run_step = b.step("run", "Running the project");
     run_step.dependOn(&run_cmd.step);
-    
+
     _ = zcc.createStep(b, "cdb", zcc_targets.toOwnedSlice(b.allocator) catch @panic("OOM"));
 }
