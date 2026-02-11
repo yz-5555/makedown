@@ -2,23 +2,21 @@
 #include <stdio.h>
 #include <string.h>
 
-void tok_init(Tokenizer *tokenizer) {
-    tokenizer->line = 0;
-    tokenizer->pos = 0;
-    tokenizer->tokens_len = 0;
+void tok_init(TokenArray *tok) {
+    tok->len = 0;
 }
-void tok_add_token(Tokenizer *tokenizer, uint32_t type, const char *value) {
-    if (tokenizer->tokens_len + 1 > TOKENS_CAPACITY)
+void tok_add_token(TokenArray *tok, uint32_t line, uint32_t pos, uint32_t type, const char *value) {
+    if (tok->len + 1 > TOKEN_ARRAY_CAPACITY)
         return;
 
-    tokenizer->tokens[tokenizer->tokens_len].line = tokenizer->line;
-    tokenizer->tokens[tokenizer->tokens_len].pos = tokenizer->pos - strlen(value);
-    tokenizer->tokens[tokenizer->tokens_len].type = type;
-    strcpy(tokenizer->tokens[tokenizer->tokens_len].value, value);
+    tok->data[tok->len].line = line;
+    tok->data[tok->len].pos = pos - strlen(value);
+    tok->data[tok->len].type = type;
+    strcpy(tok->data[tok->len].value, value);
 
-    tokenizer->tokens_len += 1;
+    tok->len += 1;
 }
-void tok_tokenize(Tokenizer *tokenizer, const char *path) {
+void tok_tokenize(TokenArray *tok, const char *path) {
     FILE *target = fopen(path, "r");
     if (target == NULL) {
         printf("ERR: Failed to read the file.");
@@ -26,9 +24,14 @@ void tok_tokenize(Tokenizer *tokenizer, const char *path) {
     }
 
     int letter = 0;
+    uint32_t line = 0, pos = 0;
+
     while ((letter = fgetc(target)) != EOF) {
         TokenType tt;
         switch (letter) {
+		case ' ':
+			tt = TT_SPACE;
+			break;
         case '#':
             tt = TT_HASH;
             break;
@@ -40,9 +43,9 @@ void tok_tokenize(Tokenizer *tokenizer, const char *path) {
             break;
         case '\n':
             tt = TT_NEWLINE;
-            tok_add_token(tokenizer, tt, "");
-            tokenizer->line += 1;
-            tokenizer->pos = 0;
+            tok_add_token(tok, line, pos, tt, "");
+            line += 1;
+            pos = 0;
             continue;
         case '-':
             tt = TT_DASH;
@@ -72,7 +75,32 @@ void tok_tokenize(Tokenizer *tokenizer, const char *path) {
             tt = TT_TEXT;
             break;
         }
-        tok_add_token(tokenizer, tt, "");
-        tokenizer->pos += 1;
+        tok_add_token(tok, line, pos, tt, "");
+        pos += 1;
+    }
+}
+void tok_print(const TokenArray *tok) {
+    char *token_type_map[14] = {
+        "TT_TEXT",
+		"TT_SPACE",
+        "TT_HASH",         // #
+        "TT_UNDERSCORE",   // _
+        "TT_STAR",         // *
+        "TT_NEWLINE",      // \n
+        "TT_DASH",         // -
+        "TT_LSQUARERACE",  // [
+        "TT_RSQUAREBRACE", // ]
+        "TT_LPAREN",       // (
+        "TT_RPAREN",       // )
+        "TT_BACKTICK",     // `
+        "TT_GREATERTHAN",  // >
+        "TT_BANG",         // !
+    };
+    for (size_t i = 0; i < tok->len; i += 1) {
+        printf("%s | line: %d, pos: %d | '%s'\n",
+               token_type_map[tok->data[i].type],
+               tok->data[i].line,
+               tok->data[i].pos,
+               tok->data[i].value);
     }
 }

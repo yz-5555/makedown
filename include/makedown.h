@@ -4,11 +4,11 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <stdio.h>
 
 // clang-format off
 typedef enum TokenType {
 	TT_TEXT,
+	TT_SPACE,
 	TT_HASH,         // #
 	TT_UNDERSCORE,   // _
 	TT_STAR,         // *
@@ -30,15 +30,14 @@ typedef struct Token {
     char value[32];
 } Token;
 
-#define LINE_CAPACITY 128
-#define TOKENS_CAPACITY 32
-typedef struct Tokenizer {
-    uint32_t line, pos;
-    Token tokens[TOKENS_CAPACITY];
-    size_t tokens_len;
-} Tokenizer;
-void tok_init(Tokenizer *tokenizer);
-void tok_add_token(Tokenizer *tokenizer, uint32_t type, const char *value);
-void tok_tokenize(Tokenizer *tokenizer, const char *path);
+#define TOKEN_ARRAY_CAPACITY 32
+typedef struct TokenArray {
+    Token data[TOKEN_ARRAY_CAPACITY];
+    size_t len;
+} TokenArray;
+void tok_init(TokenArray *tok);
+void tok_add_token(TokenArray *tok, uint32_t line, uint32_t pos, TokenType type, const char *value);
+void tok_tokenize(TokenArray *tok, const char *path);
+void tok_print(const TokenArray *tok);
 
 #endif // MD_H
