@@ -4,40 +4,49 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
 
 // clang-format off
 typedef enum TokenType {
-	TT_TEXT,
-	TT_SPACE,
+	// STREAM
 	TT_HASH,         // #
 	TT_UNDERSCORE,   // _
 	TT_STAR,         // *
-	TT_NEWLINE,      // \n
+	TT_BACKTICK,     // `
 	TT_DASH,         // -
+	// NOT STREAM
+	TT_NEWLINE,      // \n
 	TT_LSQUARERACE,  // [
 	TT_RSQUAREBRACE, // ]
 	TT_LPAREN,       // (
 	TT_RPAREN,       // )
-	TT_BACKTICK,     // `
 	TT_GREATERTHAN,  // >
 	TT_BANG,         // !
+	TT_TEXT,
 } TokenType;
 // clang-format on
 
+#define VALUE_CAPACITY 64
 typedef struct Token {
+    uint32_t count;
     uint32_t line, pos;
     TokenType type;
-    char value[32];
+    char value[VALUE_CAPACITY];
 } Token;
 
-#define TOKEN_ARRAY_CAPACITY 32
-typedef struct TokenArray {
-    Token data[TOKEN_ARRAY_CAPACITY];
-    size_t len;
-} TokenArray;
-void tok_init(TokenArray *tok);
-void tok_add_token(TokenArray *tok, uint32_t line, uint32_t pos, TokenType type, const char *value);
-void tok_tokenize(TokenArray *tok, const char *path);
-void tok_print(const TokenArray *tok);
+#define TOKENS_CAPACITY 64
+typedef struct Tokenizer {
+    uint32_t line, pos;
+    Token tokens[TOKENS_CAPACITY];
+    size_t tokens_len;
+} Tokenizer;
+void tok_init(Tokenizer *tok);
+void tok_print(const Tokenizer *tok);
+
+void tokenize(Tokenizer *tok, const char *path);
+TokenType get_token_type(char letter);
+int append_token_stream(Tokenizer *tok, char letter, TokenType type, FILE *file);
+int append_token_text(Tokenizer *tok, char letter, FILE *file);
+int append_token(Tokenizer *tok, TokenType type, FILE *file);
 
 #endif // MD_H
