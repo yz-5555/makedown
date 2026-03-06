@@ -19,7 +19,9 @@ pub fn build(b: *std.Build) void {
     const exe = b.addExecutable(.{ .name = "makedown", .root_module = b.createModule(.{ .target = target, .optimize = optimize }) });
     const src = [_][]const u8{
         "./src/main.c",
-        "./src/makedown.c"
+        "./src/makedown.c",
+        "./src/lexer.c",
+        "./src/parser.c"
     };
     exe.addCSourceFiles(.{ .files = &src, .flags = &flags });
     exe.addIncludePath(b.path("./include"));
